@@ -44,7 +44,7 @@ const SIDEBAR_WIDTH = 80
 const GRID_MAXX = 15 #specific for this map
 
 
-var playerGold = 0
+var playerGold = 100
 var myTimer
 
 
