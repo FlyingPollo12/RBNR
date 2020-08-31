@@ -1,0 +1,15 @@
+RBNR changelog
+
+Version: 0.03
+	- Added screen-fitting. Works for any window size and works in real-time
+	- Added a place for ingame menus on both right and left of game window
+	- Created basic menu screen with play button to launch game scene
+
+
+Version: 0.02
+	- Added scaling to the main node. Currently set to scale x:3 y:2
+	- Added event listener for clicks. Clicking anywhere adds HORIZONTAL_WALL to the Structures tilemap at that position
+		- This will replace any current Structures present on tilemap
+		- Only places HORIZONTAL_WALL section
+		- No rules in place to disallow, for example, building over mountains or in water!
+	- Starting app logs a bunch of info regarding screen size and the like. Should be useful for getting more accurate scaling to <i>actually</i> fit screen
