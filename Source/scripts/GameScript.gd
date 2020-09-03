@@ -1,12 +1,15 @@
 extends Node2D
 
+#---- Preloaded ----
+var cannonBall = preload("res://Source/Levels/cannonBall.tscn")
+
 
 #---- Turn Controller ----
 const ECON_PHASE = 0
 const BUILD_PHASE = 1
 const PLANNING_PHASE = 2 
 const CANNON_PHASE = 3
-var PHASE
+var PHASE #current phase var
 
 
 #---- Tile id's ----
@@ -44,18 +47,21 @@ const SIDEBAR_WIDTH = 80
 const GRID_MAXX = 15 #specific for this map
 
 
+#---- Game var globals ----
 var playerGold = 100
 var myTimer
 
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	screen_metrics()
+#setup
+	screen_metrics()#prints all screen measurements
 	
-	
+	# prepare timer. Use as:
+	#   myTimer.start()
+	#   yield(myTimer, "timeout")
 	myTimer = Timer.new()
-	myTimer.set_wait_time(2)
+	myTimer.set_wait_time(2) # wait time can be set again at any point
 	myTimer.set_one_shot(true)
 	self.add_child(myTimer)
 	
@@ -77,26 +83,29 @@ func _ready():
 	$notificationBox.hide()
 	$econStat.text = "Econ: 0"
 	PHASE = ECON_PHASE
-	Controller()
+	PhaseController()
 
 
-func Controller():
+
+func PhaseController():
+#call function based on phase
 	match PHASE:
 		ECON_PHASE:
-			econ_phase()
 			$currentPhase.text = "Econ Phase"
+			econ_phase()
 		BUILD_PHASE:
-			build_phase()
 			$currentPhase.text = "Build Phase"
-		#PLANNING_PHASE:
+			build_phase()
+		#PLANNING_PHASE: for unit planning
 		#planning_phase()
 		CANNON_PHASE:
-			cannon_phase()
 			$currentPhase.text = "Cannon Phase"
+			cannon_phase()
+
 
 
 func NextTurn():
-	print("next turn")
+	print("next turn func")
 	match PHASE:
 		ECON_PHASE:
 			PHASE = BUILD_PHASE
@@ -104,10 +113,13 @@ func NextTurn():
 			PHASE = CANNON_PHASE
 		CANNON_PHASE:
 			PHASE = ECON_PHASE
-	Controller()
+	PhaseController()
+
 
 
 func econ_phase():
+	print("econ phase")
+	
 	$notificationBox/phaseNotification.text = "Econ Phase\n" + str(playerGold) + " + 10"
 	$notificationBox.show()
 	myTimer.start()
@@ -117,15 +129,33 @@ func econ_phase():
 	NextTurn()
 
 
+
 func build_phase():
 	print("build phase")
+	
+	$notificationBox/phaseNotification.text = "Build Phase"
+	$notificationBox.show()
+	myTimer.start()
+	yield(myTimer, "timeout")
+	$notificationBox.hide()
+
 
 
 func cannon_phase():
 	print("cannon phase")
+	
+	# 2 cannons trace and point to cursor
+	# 3 only cannons you control are selected
+	
+	# 1 clicking fires cannonball at tile selected
+	
+	# 4 destroy walls when hit
+
 
 
 func _input(event):
+# Handles all input.
+# Filters input based on phase!
 	if event is InputEventMouseButton:
 		if event.is_pressed():
 			var pos = event.position
@@ -143,11 +173,18 @@ func _input(event):
 			if PHASE == BUILD_PHASE and playerGold > 4:
 				$Structures.set_cell(newx, newy, HORIZONTAL_WALL)
 				playerGold = playerGold - 5
+			if PHASE == CANNON_PHASE:
+				print("SHOOT")
+				var cball = cannonBall.instance()
+				cball.init(Vector2(32,176), Vector2(x,y))
+				add_child(cball)
+
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$econStat.text = "Econ: " + str(playerGold)
+
 
 
 func screen_metrics():
