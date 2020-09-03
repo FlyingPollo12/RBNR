@@ -176,9 +176,19 @@ func _input(event):
 			if PHASE == CANNON_PHASE:
 				print("SHOOT")
 				var cball = cannonBall.instance()
-				cball.init(Vector2(32,176), Vector2(x,y))
+				cball.init(Vector2(32,176), tileToPos(gridPos))
 				add_child(cball)
 
+
+func tileToPos(tilePos : Vector2):
+	var newx = tilePos.x * CELL_SIZE_X
+	var newy = tilePos.y * CELL_SIZE_Y
+	return Vector2(newx, newy)
+	
+func posToTile(pos : Vector2):
+	var newx : int= pos.x / CELL_SIZE_X
+	var newy : int = pos.y / CELL_SIZE_Y
+	return Vector2(newx, newy)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
