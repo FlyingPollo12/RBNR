@@ -50,6 +50,7 @@ const GRID_MAXX = 15 #specific for this map
 #---- Game var globals ----
 var playerGold = 100
 var myTimer
+export var PHASE_WAIT_TIME = 2
 
 
 
@@ -61,7 +62,7 @@ func _ready():
 	#   myTimer.start()
 	#   yield(myTimer, "timeout")
 	myTimer = Timer.new()
-	myTimer.set_wait_time(2) # wait time can be set again at any point
+	myTimer.set_wait_time(PHASE_WAIT_TIME) # wait time can be set again at any point
 	myTimer.set_one_shot(true)
 	self.add_child(myTimer)
 	
@@ -165,7 +166,7 @@ func _input(event):
 			var newx = x / CELL_SIZE_X
 			var newy = y / CELL_SIZE_Y
 			var gridPos = Vector2(newx, newy)
-			print(gridPos)
+			print("\nclick at " + str(gridPos))
 			if newx > GRID_MAXX:
 				return
 		
@@ -178,6 +179,10 @@ func _input(event):
 				var cball = cannonBall.instance()
 				cball.init(Vector2(32,176), tileToPos(gridPos))
 				add_child(cball)
+	if event is InputEventMouseMotion:
+		$Notifications.clear()
+		var tilepos = posToTile(get_local_mouse_position())
+		$Notifications.set_cell(tilepos.x, tilepos.y, 0)
 
 
 func tileToPos(tilePos : Vector2):
@@ -186,7 +191,7 @@ func tileToPos(tilePos : Vector2):
 	return Vector2(newx, newy)
 	
 func posToTile(pos : Vector2):
-	var newx : int= pos.x / CELL_SIZE_X
+	var newx : int = pos.x / CELL_SIZE_X
 	var newy : int = pos.y / CELL_SIZE_Y
 	return Vector2(newx, newy)
 

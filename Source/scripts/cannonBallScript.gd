@@ -1,8 +1,13 @@
-extends RigidBody2D
+extends Node2D
 
 
 var firingCannonPos
 var targetTilePos
+var targetReached = false
+var done = false
+onready var myTimer = get_node("Timer")
+var fireImage = load("res://Source/Textures/fire.png")
+
 export var speed : float
 
 
@@ -16,13 +21,29 @@ func init(cannonPos:Vector2, targetPos:Vector2):
 func _ready():
 	position = firingCannonPos
 	var targetTile = get_parent().posToTile(targetTilePos)
-	#print("target tile: (" + str(targetTile.x) + "," + str(targetTile.y) + ")")
+	print("target tile: " + str(targetTile))
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	set_position(get_position() + (position.direction_to(targetTilePos))*delta*speed)
-	var curPos = get_parent().posToTile(get_position())
-	#print("Current Tile: (" + str(curPos.x) + "," + str(curPos.y) + ")")
-	if get_parent().posToTile(position) == get_parent().posToTile(targetTilePos):
-		queue_free()
+	if done:
+		return
+	if targetReached:
+		done = true
+		myTimer.set_wait_time(1)
+		myTimer.start()
+		return
+	
+	var curpos = get_position()
+	set_position(curpos + (curpos.direction_to(targetTilePos))*delta*speed)
+	
+	curpos = Vector2(curpos.x + 8, curpos.y + 8)#account for offset of sprite (needed for visuals to line up with tile map!)
+	if ( get_parent().posToTile(curpos) == get_parent().posToTile(targetTilePos) ):
+		targetReached = true
+		$Sprite.set_texture(fireImage)
+		set_position(targetTilePos)
+
+
+func _timer_timeout():
+	print("hit timeout")
+	queue_free()
